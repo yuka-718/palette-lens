@@ -4,9 +4,9 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#17172b">
-  <meta name="description" content="カメラをかざすだけで、目の前の色をわかりやすい名前とコーデのヒントに変えるアクセシビリティWebアプリ。">
+  <meta name="description" content="服や身のまわりの物にカメラをかざすだけで、目の前の色をわかりやすい名前とコーデのヒントに変えるアクセシビリティWebアプリ。">
   <meta property="og:title" content="Palette Lens — 色を、ことばに。">
-  <meta property="og:description" content="服や食材にカメラをかざすと、色名・日常表現・似合う組み合わせをその場で案内します。">
+  <meta property="og:description" content="服や身のまわりの物にカメラをかざすと、色名・日常表現・似合う組み合わせをその場で案内します。">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://yuka-718.github.io/palette-lens/">
   <meta property="og:image" content="https://yuka-718.github.io/palette-lens/og.png">
@@ -40,13 +40,20 @@
       <p class="eyebrow"><span></span>Real-time color guide</p>
       <div class="intro-row">
         <h1 id="page-title">色を、<br><em>ことばに。</em></h1>
-        <p>服や食材にカメラをかざすだけ。<br>「何色？」を、色名とコーデのヒントで伝えます。</p>
+        <div class="intro-action">
+          <p>服や身のまわりの物にカメラをかざすだけ。<br>「何色？」を、色名とコーデのヒントで伝えます。</p>
+          <button class="hero-camera-button" id="hero-camera-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7.5h3.2L9 5h6l1.8 2.5H20v11H4v-11Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            カメラで試す
+          </button>
+          <span>許可しなくてもデモで体験できます</span>
+        </div>
       </div>
     </section>
 
     <section class="lens-shell" id="lens" aria-label="色を調べる">
       <div class="camera-card">
-        <div class="camera-stage" id="camera-stage">
+        <div class="camera-stage" id="camera-stage" role="group" tabindex="0" aria-label="色を選ぶ画面。タップ、または矢印キーで照準を動かし、Enterキーで判定します">
           <video id="camera-video" playsinline muted aria-label="カメラ映像"></video>
           <canvas id="photo-canvas" aria-label="選択した画像またはカラーデモ"></canvas>
           <div class="camera-shade" aria-hidden="true"></div>
@@ -68,11 +75,11 @@
             <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7.5h3.2L9 5h6l1.8 2.5H20v11H4v-11Z"/><circle cx="12" cy="13" r="3.5"/></svg>
             <span>カメラを起動</span>
           </button>
-          <label class="icon-button" for="photo-input" title="写真から選ぶ">
+          <label class="icon-button" for="photo-input" title="写真から選ぶ" role="button" tabindex="0">
             <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m5 18 4.5-4.5 3 3L15 14l4 4"/></svg>
             <span>写真</span>
           </label>
-          <input id="photo-input" class="sr-only" type="file" accept="image/*">
+          <input id="photo-input" class="sr-only" type="file" accept="image/*" tabindex="-1" aria-hidden="true">
           <button class="icon-button" id="freeze-button" type="button" disabled>
             <svg class="pause-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 6v12M16 6v12"/></svg>
             <svg class="play-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 9 6-9 6V6Z"/></svg>
@@ -84,7 +91,7 @@
       <article class="result-card" aria-labelledby="color-name">
         <div class="result-heading">
           <p>いま見ている色</p>
-          <span class="confidence" id="confidence">近似度 97%</span>
+          <span class="confidence" id="confidence">辞書一致度 97%</span>
         </div>
 
         <div class="color-answer">
@@ -128,11 +135,28 @@
       <div class="quick-grid" id="quick-grid"></div>
     </section>
 
+    <section class="vision-section" aria-labelledby="vision-title">
+      <div class="vision-statement">
+        <p class="eyebrow"><span></span>Why Palette Lens</p>
+        <h2 id="vision-title">「これ、何色？」を、<br>誰かに聞かなくてもいい。</h2>
+        <p>色の見分けづらさがある人も、色名に自信がない人も、自分で確かめて、自分で選べるように。Palette Lensは、数値だけの色判定を買い物の次の行動へつなげます。</p>
+      </div>
+      <div class="vision-points">
+        <article><span>01</span><h3>数値で終わらない</h3><p>RGBだけでなく、慣用色名と「明るい、オレンジ寄り」のような日常語で伝えます。</p></article>
+        <article><span>02</span><h3>選ぶところまで支える</h3><p>判定した色に合わせやすい色名と、服の組み合わせ方をその場で提案します。</p></article>
+        <article><span>03</span><h3>ひとりで使える</h3><p>大きな文字と音声読み上げに対応。写真やカメラ映像は端末の外へ送りません。</p></article>
+      </div>
+    </section>
+
     <section class="how-section" id="about" aria-labelledby="how-title">
       <div class="how-copy">
         <p class="eyebrow light"><span></span>How it works</p>
         <h2 id="how-title">かざす。<br>わかる。<br><em>合わせられる。</em></h2>
         <p>専門的な数値だけではなく、買い物中にそのまま使える「ことば」へ。判定はブラウザ内で行い、カメラ映像をサーバーへ送りません。</p>
+        <div class="tech-note">
+          <span>判定ロジック</span>
+          <p>選択地点まわりの複数ピクセルを平均し、sRGBから人の知覚差に近いLab色空間へ変換。31色の慣用色辞書から色差が最小の名前を選びます。</p>
+        </div>
       </div>
       <ol class="steps">
         <li><span>01</span><div><h3>色を選ぶ</h3><p>カメラの中央を合わせるか、気になる場所をタップ。</p></div></li>

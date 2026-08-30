@@ -54,8 +54,10 @@
   const reticle = document.querySelector("#reticle");
   const modeBadge = document.querySelector("#mode-badge");
   const cameraButton = document.querySelector("#camera-button");
+  const heroCameraButton = document.querySelector("#hero-camera-button");
   const freezeButton = document.querySelector("#freeze-button");
   const photoInput = document.querySelector("#photo-input");
+  const photoLabel = document.querySelector('label[for="photo-input"]');
   const messageBox = document.querySelector("#camera-message");
   const helpButton = document.querySelector("#help-button");
   const help = document.querySelector("#camera-help");
@@ -79,6 +81,7 @@
   let messageTimer = null;
   let current = { color: COLORS[12], rgb: [242, 140, 122], hex: "#F28C7A" };
   let selectedQuick = 0;
+  let samplePoint = { x: 50, y: 50 };
 
   function rgbToHex(rgb) {
     return "#" + rgb.map(value => Math.round(value).toString(16).padStart(2, "0")).join("").toUpperCase();
@@ -116,13 +119,13 @@
     const clean = rgb.map(value => Math.max(0, Math.min(255, Math.round(value))));
     const match = nearestColor(clean);
     const hex = rgbToHex(clean);
-    const score = Math.max(68, Math.min(99, Math.round(100 - match.distance * 0.85)));
+    const score = Math.max(0, Math.min(99, Math.round(100 - match.distance * 1.25)));
     current = { color: match.color, rgb: clean, hex };
     resultSwatch.style.background = hex;
     reticle.style.setProperty("--sample-color", hex);
     colorName.textContent = match.color.name;
     colorReading.textContent = match.color.words;
-    confidence.textContent = `近似度 ${score}%`;
+    confidence.textContent = `辞書一致度 ${score}%`;
     hexValue.textContent = hex;
     rgbValue.textContent = clean.join(", ");
     pairChips.replaceChildren(...match.color.pairs.map(([name, value]) => {
@@ -140,8 +143,12 @@
   }
 
   function setReticle(xPercent, yPercent) {
-    reticle.style.left = `${Math.max(8, Math.min(92, xPercent))}%`;
-    reticle.style.top = `${Math.max(8, Math.min(92, yPercent))}%`;
+    samplePoint = {
+      x: Math.max(8, Math.min(92, xPercent)),
+      y: Math.max(8, Math.min(92, yPercent))
+    };
+    reticle.style.left = `${samplePoint.x}%`;
+    reticle.style.top = `${samplePoint.y}%`;
     reticle.classList.remove("pulse");
     void reticle.offsetWidth;
     reticle.classList.add("pulse");
@@ -258,7 +265,7 @@
   function startSampling() {
     stopSampling();
     samplingTimer = setInterval(() => {
-      if (mode === "camera" && !frozen) sampleVideoAt(50, 50, false);
+      if (mode === "camera" && !frozen) sampleVideoAt(samplePoint.x, samplePoint.y, false);
     }, 420);
   }
 
@@ -302,7 +309,7 @@
       updateModeBadge("リアルタイム", true);
       setReticle(50, 50);
       startSampling();
-      sampleVideoAt(50, 50, true);
+      sampleVideoAt(samplePoint.x, samplePoint.y, true);
     } catch (error) {
       const denied = error && (error.name === "NotAllowedError" || error.name === "PermissionDeniedError");
       showMessage(denied ? "カメラの使用が許可されていません。ブラウザの設定を確認するか、写真からお試しください。" : "カメラを開始できませんでした。写真から色を選んでお試しください。");
@@ -339,6 +346,11 @@
     }
   });
 
+  heroCameraButton.addEventListener("click", () => {
+    document.querySelector("#lens").scrollIntoView({ behavior: "smooth", block: "start" });
+    if (!stream) startCamera();
+  });
+
   freezeButton.addEventListener("click", () => {
     if (!stream) return;
     frozen = !frozen;
@@ -351,13 +363,19 @@
       mode = "frozen";
       stopSampling();
       updateModeBadge("静止中");
-      sampleCanvasAt(50, 50, true);
+      sampleCanvasAt(samplePoint.x, samplePoint.y, true);
     } else {
       video.classList.add("active");
       mode = "camera";
       updateModeBadge("リアルタイム", true);
-      setReticle(50, 50);
       startSampling();
+    }
+  });
+
+  photoLabel.addEventListener("keydown", event => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      photoInput.click();
     }
   });
 
@@ -395,8 +413,23 @@
     const x = ((event.clientX - rect.left) / rect.width) * 100;
     const y = ((event.clientY - rect.top) / rect.height) * 100;
     setReticle(x, y);
-    if (mode === "camera") sampleVideoAt(x, y, true);
-    else sampleCanvasAt(x, y, true);
+    if (mode === "camera") sampleVideoAt(samplePoint.x, samplePoint.y, true);
+    else sampleCanvasAt(samplePoint.x, samplePoint.y, true);
+  });
+
+  stage.addEventListener("keydown", event => {
+    const moves = { ArrowLeft: [-4, 0], ArrowRight: [4, 0], ArrowUp: [0, -4], ArrowDown: [0, 4] };
+    if (moves[event.key]) {
+      event.preventDefault();
+      const [x, y] = moves[event.key];
+      setReticle(samplePoint.x + x, samplePoint.y + y);
+      if (mode === "camera") sampleVideoAt(samplePoint.x, samplePoint.y, true);
+      else sampleCanvasAt(samplePoint.x, samplePoint.y, true);
+    } else if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      if (mode === "camera") sampleVideoAt(samplePoint.x, samplePoint.y, true);
+      else sampleCanvasAt(samplePoint.x, samplePoint.y, true);
+    }
   });
 
   helpButton.addEventListener("click", () => {
