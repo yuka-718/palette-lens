@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#17172b">
+  <meta name="description" content="カメラをかざすだけで、目の前の色をわかりやすい名前とコーデのヒントに変えるアクセシビリティWebアプリ。">
+  <meta property="og:title" content="Palette Lens — 色を、ことばに。">
+  <meta property="og:description" content="服や食材にカメラをかざすと、色名・日常表現・似合う組み合わせをその場で案内します。">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yuka-718.github.io/palette-lens/">
+  <meta property="og:image" content="https://yuka-718.github.io/palette-lens/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Palette Lens。色を、ことばに。">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Palette Lens — 色を、ことばに。">
+  <meta name="twitter:description" content="カメラで色名とコーデのヒントがわかるアクセシビリティWebアプリ。">
+  <meta name="twitter:image" content="https://yuka-718.github.io/palette-lens/og.png">
+  <title>Palette Lens — 色を、ことばに。</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%2317172b'/%3E%3Ccircle cx='32' cy='32' r='18' fill='%23ff806e'/%3E%3Ccircle cx='32' cy='32' r='7' fill='%23fff9ef'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-link" href="#lens">カメラへ移動</a>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="#top" aria-label="Palette Lens ホーム">
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <span>Palette Lens</span>
+    </a>
+    <div class="header-meta">
+      <span class="privacy-label"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3 5 6v5c0 4.6 2.8 8.5 7 10 4.2-1.5 7-5.4 7-10V6l-7-3Z"/><path d="m9.2 12 1.8 1.8 4-4"/></svg>映像は端末の中だけ</span>
+      <a class="text-link" href="#about">このアプリについて</a>
+    </div>
+  </header>
+
+  <main>
+    <section class="intro" aria-labelledby="page-title">
+      <p class="eyebrow"><span></span>Real-time color guide</p>
+      <div class="intro-row">
+        <h1 id="page-title">色を、<br><em>ことばに。</em></h1>
+        <p>服や食材にカメラをかざすだけ。<br>「何色？」を、色名とコーデのヒントで伝えます。</p>
+      </div>
+    </section>
+
+    <section class="lens-shell" id="lens" aria-label="色を調べる">
+      <div class="camera-card">
+        <div class="camera-stage" id="camera-stage">
+          <video id="camera-video" playsinline muted aria-label="カメラ映像"></video>
+          <canvas id="photo-canvas" aria-label="選択した画像またはカラーデモ"></canvas>
+          <div class="camera-shade" aria-hidden="true"></div>
+          <div class="stage-top">
+            <span class="mode-badge" id="mode-badge"><i></i>デモモード</span>
+            <button class="help-button" id="help-button" type="button" aria-expanded="false" aria-controls="camera-help">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.2 2.1c-.8.4-1 1-1 1.9M12 17h.01"/></svg>
+              <span class="sr-only">カメラの使い方</span>
+            </button>
+          </div>
+          <div class="camera-help" id="camera-help" hidden>中央の照準を調べたい色に合わせるか、画面の好きな場所をタップしてください。</div>
+          <div class="reticle" id="reticle" aria-hidden="true"><span></span></div>
+          <div class="tap-hint" id="tap-hint">画面をタップして色を選択</div>
+          <div class="camera-message" id="camera-message" role="status" aria-live="polite"></div>
+        </div>
+
+        <div class="camera-controls" aria-label="カメラ操作">
+          <button class="primary-button" id="camera-button" type="button">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 7.5h3.2L9 5h6l1.8 2.5H20v11H4v-11Z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            <span>カメラを起動</span>
+          </button>
+          <label class="icon-button" for="photo-input" title="写真から選ぶ">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m5 18 4.5-4.5 3 3L15 14l4 4"/></svg>
+            <span>写真</span>
+          </label>
+          <input id="photo-input" class="sr-only" type="file" accept="image/*">
+          <button class="icon-button" id="freeze-button" type="button" disabled>
+            <svg class="pause-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="M8 6v12M16 6v12"/></svg>
+            <svg class="play-icon" aria-hidden="true" viewBox="0 0 24 24"><path d="m9 6 9 6-9 6V6Z"/></svg>
+            <span>固定</span>
+          </button>
+        </div>
+      </div>
+
+      <article class="result-card" aria-labelledby="color-name">
+        <div class="result-heading">
+          <p>いま見ている色</p>
+          <span class="confidence" id="confidence">近似度 97%</span>
+        </div>
+
+        <div class="color-answer">
+          <span class="result-swatch" id="result-swatch" aria-hidden="true"></span>
+          <div>
+            <h2 id="color-name">サーモンピンク</h2>
+            <p id="color-reading">明るい、オレンジ寄りのピンク</p>
+          </div>
+        </div>
+
+        <div class="values" aria-label="色の数値">
+          <div><span>HEX</span><strong id="hex-value">#F28C7A</strong></div>
+          <div><span>RGB</span><strong id="rgb-value">242, 140, 122</strong></div>
+          <button class="copy-button" id="copy-button" type="button" aria-label="カラーコードをコピー">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="11" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg>
+          </button>
+        </div>
+
+        <section class="pairing" aria-labelledby="pairing-title">
+          <div class="pairing-title-row">
+            <p id="pairing-title">合わせやすい色</p>
+            <span>コーデ提案</span>
+          </div>
+          <div class="pair-chips" id="pair-chips"></div>
+          <p class="style-tip" id="style-tip">ネイビーをボトムにすると、やわらかさが引き締まります。</p>
+        </section>
+
+        <button class="speak-button" id="speak-button" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M11 5 6.5 9H3v6h3.5l4.5 4V5ZM15.5 9a4.5 4.5 0 0 1 0 6M18 6.5a8 8 0 0 1 0 11"/></svg>
+          <span>色名を読み上げる</span>
+        </button>
+        <div class="sr-only" id="result-announcement" aria-live="polite"></div>
+      </article>
+    </section>
+
+    <section class="quick-colors" aria-labelledby="quick-title">
+      <div class="section-label">
+        <p class="eyebrow"><span></span>Try without camera</p>
+        <h2 id="quick-title">まずは色を選んで試す</h2>
+      </div>
+      <div class="quick-grid" id="quick-grid"></div>
+    </section>
+
+    <section class="how-section" id="about" aria-labelledby="how-title">
+      <div class="how-copy">
+        <p class="eyebrow light"><span></span>How it works</p>
+        <h2 id="how-title">かざす。<br>わかる。<br><em>合わせられる。</em></h2>
+        <p>専門的な数値だけではなく、買い物中にそのまま使える「ことば」へ。判定はブラウザ内で行い、カメラ映像をサーバーへ送りません。</p>
+      </div>
+      <ol class="steps">
+        <li><span>01</span><div><h3>色を選ぶ</h3><p>カメラの中央を合わせるか、気になる場所をタップ。</p></div></li>
+        <li><span>02</span><div><h3>ことばで知る</h3><p>慣用色名と「明るい青緑」のような日常表現で表示。</p></div></li>
+        <li><span>03</span><div><h3>組み合わせる</h3><p>服選びに使いやすい相性のよい色と着こなしを提案。</p></div></li>
+      </ol>
+    </section>
+  </main>
+
+  <footer>
+    <div class="footer-brand">
+      <span class="brand-mark" aria-hidden="true"><span></span></span>
+      <div><strong>Palette Lens</strong><p>色のちがいを、選ぶ楽しさへ。</p></div>
+    </div>
+    <p class="prototype-note">色は照明やカメラにより見え方が変わります。重要な判断では、ほかの確認方法もあわせてご利用ください。</p>
+    <span>© 2026 PALETTE LENS — PROTOTYPE</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
